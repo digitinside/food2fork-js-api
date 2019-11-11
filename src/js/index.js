@@ -1,6 +1,7 @@
 import Search from './models/Search';
 import Recipe from './models/Recipe';
 import * as searchView from './views/searcheView';
+import * as recipeView from './views/recipeView';
 import { elements, renderLoader, clearLoader } from './views/base';
 
 /** Global state of the app
@@ -66,6 +67,12 @@ elements.searchResPages.addEventListener('click', e => {
 const controlRecipe = async() => {
     const id = window.location.hash.replace('#', '');
     if(id) {
+        recipeView.clearRecipe();
+        renderLoader(elements.recipe);
+
+        // Highlight selected search item
+        if (state.search) searchView.highlightSelected(id);
+
         state.recipe = new Recipe(id);
 
         try {
@@ -74,6 +81,11 @@ const controlRecipe = async() => {
             state.recipe.calcServings();
     
             console.log(state.recipe);
+            
+            recipeView.renderRecipe(
+                state.recipe,
+                state.likes.isLiked(id)
+            );
         }
         catch(error) {
             console.log(error);

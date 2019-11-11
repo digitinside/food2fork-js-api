@@ -1,4 +1,5 @@
 import Search from './models/Search';
+import Recipe from './models/Recipe';
 import * as searchView from './views/searcheView';
 import { elements, renderLoader, clearLoader } from './views/base';
 
@@ -10,6 +11,9 @@ import { elements, renderLoader, clearLoader } from './views/base';
 */
 const state = {};
 
+/**
+ * Search controller
+ */
 const controlSearch = async () => {
     const query = searchView.getInput();    
     if(query) {
@@ -19,20 +23,26 @@ const controlSearch = async () => {
         searchView.clearResults();
         renderLoader(elements.searchRes);
 
-        await state.search.getResults();
-        //searchView.renderResults(state.search.result);
-
-        const recipe = [
-            { recipe_id: 55662, title: 'My recipe 1', publisher: 'Publisher 1', image_url: 'img/test-1.jpg'},
-            { recipe_id: 66554, title: 'My recipe 2', publisher: 'Publisher 2', image_url: 'img/test-2.jpg'},
-            { recipe_id: 35445, title: 'My recipe 3My recipe 3My recipe 3My recipe 3My recipe 3', publisher: 'Publisher 3', image_url: 'img/test-3.jpg'},
-            { recipe_id: 43535, title: 'My recipe 4', publisher: 'Publisher 4', image_url: 'img/test-4.jpg'},
-            { recipe_id: 44554, title: 'My recipe 5', publisher: 'Publisher 5', image_url: 'img/test-5.jpg'},
-            { recipe_id: 45554, title: 'My recipe 6', publisher: 'Publisher 6', image_url: 'img/test-6.jpg'}
-        ];
-
-        clearLoader();
-        searchView.renderResults(recipe);
+        try {
+            await state.search.getResults();
+            //searchView.renderResults(state.search.result);
+    
+            const recipe = [
+                { recipe_id: 55662, title: 'My recipe 1', publisher: 'Publisher 1', image_url: 'img/test-1.jpg'},
+                { recipe_id: 66554, title: 'My recipe 2', publisher: 'Publisher 2', image_url: 'img/test-2.jpg'},
+                { recipe_id: 35445, title: 'My recipe 3My recipe 3My recipe 3My recipe 3My recipe 3', publisher: 'Publisher 3', image_url: 'img/test-3.jpg'},
+                { recipe_id: 43535, title: 'My recipe 4', publisher: 'Publisher 4', image_url: 'img/test-4.jpg'},
+                { recipe_id: 44554, title: 'My recipe 5', publisher: 'Publisher 5', image_url: 'img/test-5.jpg'},
+                { recipe_id: 45554, title: 'My recipe 6', publisher: 'Publisher 6', image_url: 'img/test-6.jpg'}
+            ];
+    
+            clearLoader();
+            searchView.renderResults(recipe);
+        }
+        catch(error) {
+            console.log(error);
+            clearLoader();
+        }
     }
 }
 
@@ -40,7 +50,6 @@ elements.searchForm.addEventListener('submit', e => {
     e.preventDefault();
     controlSearch();
 });
-
 
 elements.searchResPages.addEventListener('click', e => {
     const btn = e.target.closest('.btn-inline');
@@ -51,3 +60,27 @@ elements.searchResPages.addEventListener('click', e => {
     }
 });
 
+/**
+ * Recipe controller
+ */
+const controlRecipe = async() => {
+    const id = window.location.hash.replace('#', '');
+    if(id) {
+        state.recipe = new Recipe(id);
+
+        try {
+            await state.recipe.getRecipe();
+            state.recipe.calcTime();
+            state.recipe.calcServings();
+    
+            console.log(state.recipe);
+        }
+        catch(error) {
+            console.log(error);
+        }
+    }
+};
+
+// window.addEventListener('hashchange', controlRecipe);
+// window.addEventListener('load', controlRecipe);
+['hashchange', 'load'].forEach(event => window.addEventListener(event, controlRecipe));

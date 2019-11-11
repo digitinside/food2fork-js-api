@@ -21,7 +21,6 @@ const controlSearch = async () => {
 
         await state.search.getResults();
         //searchView.renderResults(state.search.result);
-        clearLoader();
 
         const recipe = [
             { recipe_id: 55662, title: 'My recipe 1', publisher: 'Publisher 1', image_url: 'img/test-1.jpg'},
@@ -32,6 +31,7 @@ const controlSearch = async () => {
             { recipe_id: 45554, title: 'My recipe 6', publisher: 'Publisher 6', image_url: 'img/test-6.jpg'}
         ];
 
+        clearLoader();
         searchView.renderResults(recipe);
     }
 }
@@ -39,5 +39,15 @@ const controlSearch = async () => {
 elements.searchForm.addEventListener('submit', e => {
     e.preventDefault();
     controlSearch();
+});
+
+
+elements.searchResPages.addEventListener('click', e => {
+    const btn = e.target.closest('.btn-inline');
+    if(btn) {
+        const goToPage = parseInt(btn.dataset.goto);   
+        searchView.clearResults(); 
+        searchView.renderResults(state.search.result, goToPage);
+    }
 });
 
